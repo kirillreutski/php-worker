@@ -1,0 +1,11 @@
+{
+    "name": "kirillreutski/php-worker",
+    "description": "Generic PHP worker. DB Agnostic. CRON required (or any other scheduler",
+    "autoload": {
+        "psr-4": {
+            "kirillreutski\\PhpWorker\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
