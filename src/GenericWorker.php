@@ -3,6 +3,7 @@
 namespace kirillreutski\PhpWorker; 
 
 use Step;
+use GenericWorkerRecord; 
 /**
  * 
  * array $wr: 
@@ -22,14 +23,14 @@ class GenericWorker {
     public static array $steps = [];
     public ?\kirillreutski\PhpWorker\Step $currentStep = null;
     public int $currentStepNumber = 0;
-    private array $workerRecord = []; 
-    public function __construct(array $wr){
+    private ?GenericWorkerRecord $workerRecord = null;
+    public function __construct(GenericWorkerRecord $wr){
         $this->workerRecord = $wr;
-        $this->workerType = isset($this->workerRecord['workerType']) && $this->workerRecord['workerType'] == 'recurring' ? 'recurring' : 'singleRun';
-        if (isset($this->workerRecord['current_step']) ) {
-            if ($this->workerRecord['current_step'] == 'done') throw new \Exception('Worker already done');
+        $this->workerType = isset($this->workerRecord->workerType) && $this->workerRecord->workerType == 'recurring' ? 'recurring' : 'singleRun';
+        if (isset($this->workerRecord->current_step) ) {
+            if ($this->workerRecord->current_step == 'done') throw new \Exception('Worker already done');
             foreach (static::$steps as $k => $step) {
-                if ($step->name == $this->workerRecord['current_step']) {
+                if ($step->name == $this->workerRecord->current_step) {
                     $this->currentStep = $step;
                     $this->currentStepNumber = $k;
                 }
@@ -45,10 +46,10 @@ class GenericWorker {
             }
             
         }
-        if (isset($this->workerRecord['data'])) {
-            if ($this->workerRecord['data'] === null || $this->workerRecord['data'] === '') $this->data = [];
+        if (isset($this->workerRecord->data)) {
+            if ($this->workerRecord->data === null || $this->workerRecord->data === '') $this->data = [];
             else {
-                $this->data = json_decode($this->workerRecord['data'], true);
+                $this->data = json_decode($this->workerRecord->data, true);
             }
         } else {
             $this->data = []; 
@@ -102,13 +103,13 @@ class GenericWorker {
 
     public function suspend(){
         if ($this->currentStep !== null){
-            $this->workerRecord['current_step'] = $this->currentStep->name;
-            if ($this->workerType == 'recurring') $this->workerRecord['next_run'] = $this->currentStep->getNextRun();
+            $this->workerRecord->current_step = $this->currentStep->name;
+            if ($this->workerType == 'recurring') $this->workerRecord->next_run = $this->currentStep->getNextRun();
         } else {
-            $this->workerRecord['current_step'] = 'done';
+            $this->workerRecord->current_step = 'done';
         }
-        $this->workerRecord['data'] = json_encode($this->data);
-        $this->workerRecord['handling_status'] = static::$STATUS_AWAITING_NEXT_RUN;
+        $this->workerRecord->data = json_encode($this->data);
+        $this->workerRecord->handling_status = static::$STATUS_AWAITING_NEXT_RUN;
         
         $this->saveState(); 
     }
@@ -132,14 +133,14 @@ class GenericWorker {
         if ($this->workerType == 'singleRun') {
             $this->updateStatus(static::$STATUS_DONE);
         } else {
-            $this->workerRecord['next_run'] = $this->currentStep->getNextRun();
+            $this->workerRecord->next_run = $this->currentStep->getNextRun();
             $this->updateStatusToAwaitingNextRun();
         }
         
     }
 
     public function updateStatus(string $newStatus): void{
-        $this->workerRecord['handling_status'] = $newStatus; 
+        $this->workerRecord->handling_status = $newStatus; 
 
     }
 
