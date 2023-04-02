@@ -93,12 +93,9 @@ class GenericWorker {
 
         static::addLog("stopped; step: " . ($this->currentStep === null ? 'none' : $this->currentStep->name));;
         static::addLog("completed: " . $completed);
-
         if ($completed) $this->updateStatusToDone();
-        else {
-            $this->suspend();
-        }
 
+        $this->suspend();
     }
 
     public function suspend(){
@@ -109,7 +106,7 @@ class GenericWorker {
             $this->workerRecord->current_step = 'done';
         }
         $this->workerRecord->data = $this->data;
-        $this->workerRecord->handling_status = static::$STATUS_AWAITING_NEXT_RUN;
+        $this->workerRecord->handling_status = $this->workerRecord->current_step === 'done' ? static::$STATUS_DONE : static::$STATUS_AWAITING_NEXT_RUN;
         
         $this->saveState(); 
     }
