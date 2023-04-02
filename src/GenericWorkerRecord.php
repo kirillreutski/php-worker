@@ -19,4 +19,13 @@ class GenericWorkerRecord {
     public static function init(array $data) {
         return new static($data); 
     }
+
+    public function dump() : array {
+        $out = []; 
+        foreach (static::$fields as $field) {
+            $out[$field] = $this->{$field};
+        }
+
+        return $out; 
+    }
 }
