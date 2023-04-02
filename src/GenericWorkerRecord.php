@@ -10,7 +10,7 @@ class GenericWorkerRecord {
     public string $next_run; 
 
     public function __construct(array $data){
-        foreach (static::$fields as $field) {
+        foreach (get_class_vars(static::class) as $field => $defValue) {
             if (isset($data[$field])) {
                 $this->{$field} = $data[$field];
             }   

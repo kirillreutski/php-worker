@@ -2,6 +2,8 @@
 
 namespace kirillreutski\PhpWorker; 
 
+use kirillreutski\PhpWorker\GenericWorkerRecord; 
+
 class GenericProcessRunner {
     public static function runNext($next_run_field = 'next_run'){
         $list = static::getProcessList(); 
@@ -23,7 +25,8 @@ class GenericProcessRunner {
 
         if ($foundNextIndex != null) {
             $targetTask = $list[$foundNextIndex];
-            $targetTask['handler']::init($targetTask)->run();
+            $workerRecord = GenericWorkerRecord::init($targetTask);;
+            $targetTask['handler']::init($workerRecord)->run();
         } else {
             die('No tasks to run at this moment');
         }

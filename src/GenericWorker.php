@@ -3,7 +3,7 @@
 namespace kirillreutski\PhpWorker; 
 
 use Step;
-use GenericWorkerRecord; 
+use kirillreutski\PhpWorker\GenericWorkerRecord; 
 /**
  * 
  * array $wr: 
@@ -15,7 +15,7 @@ use GenericWorkerRecord;
  * 
  */
 class GenericWorker {
-    public static string $workerType = 'singleRun';
+    public string $workerType = 'singleRun';
     public static string $STATUS_DONE = 'done';
     public static string $STATUS_AWAITING_NEXT_RUN = 'awaitingNextRun';
     public static string $STATUS_IN_PROGRESS = 'inProgress';
@@ -49,7 +49,7 @@ class GenericWorker {
         if (isset($this->workerRecord->data)) {
             if ($this->workerRecord->data === null || $this->workerRecord->data === '') $this->data = [];
             else {
-                $this->data = json_decode($this->workerRecord->data, true);
+                $this->data = $this->workerRecord->data;
             }
         } else {
             $this->data = []; 
@@ -57,10 +57,10 @@ class GenericWorker {
         
         $this->updateStatusToInProgress();
     }
-    public static function init(array $data, string $handlerName = null ) {
+    public static function init(GenericWorkerRecord $wr, string $handlerName = null ) {
         
         if ($handlerName === null) $handlerName = static::class;
-        return new ($handlerName)($data);
+        return new ($handlerName)($wr);
     }
 
     public function goToNextStep(){
@@ -108,7 +108,7 @@ class GenericWorker {
         } else {
             $this->workerRecord->current_step = 'done';
         }
-        $this->workerRecord->data = json_encode($this->data);
+        $this->workerRecord->data = $this->data;
         $this->workerRecord->handling_status = static::$STATUS_AWAITING_NEXT_RUN;
         
         $this->saveState(); 
