@@ -23,7 +23,7 @@ class GenericWorker {
     public static array $steps = [];
     public ?\kirillreutski\PhpWorker\Step $currentStep = null;
     public int $currentStepNumber = 0;
-    private ?GenericWorkerRecord $workerRecord = null;
+    protected ?GenericWorkerRecord $workerRecord = null;
     public function __construct(GenericWorkerRecord $wr){
         $this->workerRecord = $wr;
         $this->workerType = isset($this->workerRecord->workerType) && $this->workerRecord->workerType == 'recurring' ? 'recurring' : 'singleRun';
