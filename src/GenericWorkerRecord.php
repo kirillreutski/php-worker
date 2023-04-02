@@ -21,14 +21,14 @@ class GenericWorkerRecord {
     }
 
     public function dump() : array {
-        $out = []; 
-        foreach (static::$fields as $field) {
+        $out = [];
+        foreach (get_class_vars(static::class) as $field => $defValue) {
             if (isset($this->{$field})) {
                 $out[$field] = $this->{$field};
             }
 
         }
 
-        return $out; 
+        return $out;
     }
 }
