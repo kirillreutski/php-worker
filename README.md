@@ -1,3 +1,8 @@
+# todo
+1. describe full db table which stores tasks
+2. implement recurring tasks
+
+
 # php-worker
 
 Your worker class should extend \kirillreutski\PhpWorker\GenericWorker.
@@ -28,6 +33,10 @@ Step is an object of type kirillreutski\PhpWorker\Step; Worker class should cont
 To run a worker, do: 
 $worker = Custom\RealWorker::init([...]);
 $worker->run(); 
+
+Also process runner implemented which picks a first task to be run: 
+$worker = Custom\ProcessRunner::runNext(); 
+ProcessRunner extends GenericProcessRunner and overrides public static function getProcessList (returns array of tasks) 
 
 Worker expects the following data in passed array: 
 [
