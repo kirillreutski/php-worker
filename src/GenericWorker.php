@@ -3,8 +3,18 @@
 namespace kirillreutski\PhpWorker; 
 
 use Step;
- 
+/**
+ * 
+ * array $wr: 
+ * current_step - step name
+ * workerType - singleRun/recurring
+ * data - array of any data required for steps 
+ * handling_status - current status of handler process — awaitingNextRun/inProgress/done
+ * next_run - date & time of next run
+ * 
+ */
 class GenericWorker {
+    public static string $workerType = 'singleRun';
     public static string $STATUS_DONE = 'done';
     public static string $STATUS_AWAITING_NEXT_RUN = 'awaitingNextRun';
     public static string $STATUS_IN_PROGRESS = 'inProgress';
@@ -15,7 +25,7 @@ class GenericWorker {
     private array $workerRecord = []; 
     public function __construct(array $wr){
         $this->workerRecord = $wr;
-
+        $this->workerType = isset($this->workerRecord['workerType']) && $this->workerRecord['workerType'] == 'recurring' ? 'recurring' : 'singleRun';
         if (isset($this->workerRecord['current_step']) ) {
             if ($this->workerRecord['current_step'] == 'done') throw new \Exception('Worker already done');
             foreach (static::$steps as $k => $step) {
@@ -93,11 +103,13 @@ class GenericWorker {
     public function suspend(){
         if ($this->currentStep !== null){
             $this->workerRecord['current_step'] = $this->currentStep->name;
+            if ($this->workerType == 'recurring') $this->workerRecord['next_run'] = $this->currentStep->getNextRun();
         } else {
             $this->workerRecord['current_step'] = 'done';
         }
         $this->workerRecord['data'] = json_encode($this->data);
         $this->workerRecord['handling_status'] = static::$STATUS_AWAITING_NEXT_RUN;
+        
         $this->saveState(); 
     }
 
@@ -117,10 +129,17 @@ class GenericWorker {
 
     public function updateStatusToDone(): void
     {
-        $this->updateStatus(static::$STATUS_DONE);
+        if ($this->workerType == 'singleRun') {
+            $this->updateStatus(static::$STATUS_DONE);
+        } else {
+            $this->workerRecord['next_run'] = $this->currentStep->getNextRun();
+            $this->updateStatusToAwaitingNextRun();
+        }
+        
     }
 
     public function updateStatus(string $newStatus): void{
+        $this->workerRecord['handling_status'] = $newStatus; 
 
     }
 
