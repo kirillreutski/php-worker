@@ -21,6 +21,8 @@ interface IGenericWorkerRecord {
     public function getNextRun() : string|null; 
     public function setNextRun(string $nr); 
     public function getData(): array; 
+    public function setData(array $data);
+    public function addData($key, $value);
 
         
 }

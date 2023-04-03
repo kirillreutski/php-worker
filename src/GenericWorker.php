@@ -44,6 +44,7 @@ class GenericWorker {
             }
             
         }
+        $this->data = $this->workerRecord->getData();
         $this->updateStatusToInProgress();
     }
     public static function init(IGenericWorkerRecord $wr, string $handlerName = null ) {
