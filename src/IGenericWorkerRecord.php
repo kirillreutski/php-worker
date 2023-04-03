@@ -16,9 +16,9 @@ interface IGenericWorkerRecord {
     public function getCurrentStep() : string|null; 
     public function setCurrentStep(string $ns); 
     public function getWorkerType() : string; 
-    public function getHandlingStatus() : string; 
+    public function getHandlingStatus() : string|null; 
     public function setHandlingStatus(string $hs); 
-    public function getNextRun() : string; 
+    public function getNextRun() : string|null; 
     public function setNextRun(string $nr); 
     public function getData(): array; 
 
