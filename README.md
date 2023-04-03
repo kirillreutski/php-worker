@@ -1,6 +1,5 @@
 # todo
-1. describe full db table which stores tasks
-2. implement recurring tasks
+1. Rebuild status updating — not only with suspend
 
 
 # php-worker
